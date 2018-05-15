@@ -16,10 +16,10 @@ The project involves creating projects for the subject of data mining. The proje
     * http://www.cs.put.poznan.pl/ibladek/students/ed/dane/komputery.csv
     
 #
-### Dependencies
+#### Dependencies
 * Python 3.6 [https://www.python.org/]
 
 #
-#### Creators
+### Creators
 * Maciej Hałas
 * Ksawery Janik
