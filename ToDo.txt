@@ -1,2 +1,5 @@
 Zadania do wykonania:
-* 
+* [K] dokonać paramertyzacji programu - wczytywanie wartości z CMD
+* obliczanie odległości w metryce manhattan (odległość taksówkowa) i euklidesowej
+* klasyfikator knn
+*

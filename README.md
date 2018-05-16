@@ -4,6 +4,10 @@ The repository contains two projects in Python
 * decision trees.
 
 The project involves creating projects for the subject of data mining. The project was made using translation data
+#
+#### Project description:
+* KNN classifier [http://www.cs.put.poznan.pl/ibladek/students/ed/lab2/projekt_knn.pdf]
+* Decision trees [http://www.cs.put.poznan.pl/ibladek/students/ed/lab3/projekt_dd.pdf]
 
 #
 #### Used data for project:
