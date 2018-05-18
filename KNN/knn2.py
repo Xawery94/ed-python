@@ -12,6 +12,11 @@ def euclideanDistance(data1, data2, length):
         distance += np.square(data1[x] - data2[x])
     return np.sqrt(distance)
 
+def manhattanDistance(data1, data2, length):
+    distance = 0
+    for x in range(length):
+        distance += np.absolute(data1[x] - data2[x])
+    return distance
 
 def knn(trainingSet, testInstance, k):
     distances = {}
