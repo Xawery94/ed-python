@@ -83,7 +83,9 @@ def calculateAccuracy(testData, predictedData):
 
 def SetCalculateDistanceMethod(method):
     if(method == "m"):
-        calculateDistanceMethod = manhattanDistance
+        return manhattanDistance
+    elif(method == "e"):
+        return euclideanDistance
 
 def printResult(classes, neighbors, accuracy):
     print('')
@@ -96,12 +98,12 @@ def printResult(classes, neighbors, accuracy):
     print('#########')
 # -----------------------------------------------------
 
-arg_calculateDistanceMethod = "e"
+arg_calculateDistanceMethod = "m"
 arg_test_size = 0.1
 arg_col = 5
 arg_k = 3
 
-calculateDistanceMethod = euclideanDistance
+calculateDistanceMethod = SetCalculateDistanceMethod(arg_calculateDistanceMethod)
 col = arg_col - 1
 data = pd.read_csv("KNN/iris.csv")
 data = data.values
@@ -110,6 +112,7 @@ data = pd.DataFrame(data)
 
 trainingData = data[:-int(arg_test_size * len(data))]
 testData = data[-int(arg_test_size * len(data)):]
+
 
 result, neighbors, accuracy = knn(trainingData, testData, arg_k)
 printResult(result, neighbors, accuracy)
