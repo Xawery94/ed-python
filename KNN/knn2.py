@@ -1,3 +1,4 @@
+import random
 import operator
 
 import numpy as np
@@ -16,10 +17,11 @@ def knn(trainingSet, testInstance, k):
 
         neighborsForTests[number] = neighbors
         predictedClassesForTests[number] = mostFrequentClass
+
         number+=1
 
-
-    return predictedClassesForTests, neighborsForTests
+    accuracy = calculateAccuracy(testInstance, predictedClassesForTests)
+    return predictedClassesForTests, neighborsForTests, accuracy
 
 def calculateDistancesToAllTrainingSets(trainingSet, testInstance):
     objectArgumentsCount = testInstance.shape[0]
@@ -44,7 +46,7 @@ def getMostFrequentClass(trainingSet, neighbors):
     classVotes = {}
 
     for x in range(len(neighbors)):
-        response = trainingSet.iloc[neighbors[x]][-1]
+        response = trainingSet.iloc[neighbors[x]][col]
 
         if response in classVotes:
             classVotes[response] += 1
@@ -58,36 +60,56 @@ def getMostFrequentClass(trainingSet, neighbors):
 def euclideanDistance(data1, data2, length):
     distance = 0
     for x in range(length):
-        distance += np.square(data1[x] - data2[x])
+        if(x != col):
+            distance += np.square(data1[x] - data2[x])
     return np.sqrt(distance)
 def manhattanDistance(data1, data2, length):
     distance = 0
     for x in range(length):
-        distance += np.absolute(data1[x] - data2[x])
+        if(x != col):
+            distance += np.absolute(data1[x] - data2[x])
     return distance
 
-def printResult(classes, neighbors):
+def calculateAccuracy(testData, predictedData):
+    correctClasses = 0
+
+    totalPredictionsNumber = 0
+    for data in predictedData:
+        if(predictedData[data] == testData.values[totalPredictionsNumber][col]):
+            correctClasses += 1
+        totalPredictionsNumber += 1
+    
+    return correctClasses*100/totalPredictionsNumber
+
+def SetCalculateDistanceMethod(method):
+    if(method == "m"):
+        calculateDistanceMethod = manhattanDistance
+
+def printResult(classes, neighbors, accuracy):
     print('')
+    print("Accuracy :", str(accuracy) + "%")
     print('#########')
-    print('Classes:')
-    print(classes)
-    print('Neighbors: ')
-    print(neighbors)
+    for c in classes:
+        print("Class :", classes[c])
+        print("Neighbors :", neighbors[c])
+        print("---------------------------")
     print('#########')
 # -----------------------------------------------------
 
-k = 3
-data = pd.read_csv("KNN/iris.csv")
-
-testSet = [[7.2, 3.6, 5.1, 2.5],
-           [1.2, 3.6, 5.1, 5.5],
-           [7.2, 2.6, 5.1, 2.5]]
-
-test = pd.DataFrame(testSet)
+arg_calculateDistanceMethod = "e"
+arg_test_size = 0.1
+arg_col = 5
+arg_k = 3
 
 calculateDistanceMethod = euclideanDistance
-# calculateDistanceMethod = manhattanDistance
+col = arg_col - 1
+data = pd.read_csv("KNN/iris.csv")
+data = data.values
+random.shuffle(data)
+data = pd.DataFrame(data)
 
-result, neighbors = knn(data, test, k)
+trainingData = data[:-int(arg_test_size * len(data))]
+testData = data[-int(arg_test_size * len(data)):]
 
-printResult(result, neighbors)
+result, neighbors, accuracy = knn(trainingData, testData, arg_k)
+printResult(result, neighbors, accuracy)

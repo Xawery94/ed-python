@@ -8,6 +8,8 @@ parser.add_argument('-m', '--metric', default='e', help='Type of metric', metava
 parser.add_argument('-t', '--train', default='train', help='Type of test set', metavar='')
 parser.add_argument('-f', '--file', required=True, default='iris.csv', help='Data file path', metavar='')
 
+# parametr do programu - która kolumna jest klasową 
+
 args = parser.parse_args()
 
 
