@@ -12,7 +12,7 @@ parser.add_argument('-t', '--train', default='train', help='Type of test set [tr
 parser.add_argument('-d', '--decision', required=True, type=int, default=1, help='Index of decision attribute',
                     metavar='')
 parser.add_argument('-s', '--split', default=0.25, help='Split size in percent', metavar='')
-parser.add_argument('-f', '--file', required=True, help='Data file path', metavar='FILE')
+parser.add_argument('file', type=argparse.FileType('r'), metavar='FILE')
 
 group = parser.add_mutually_exclusive_group()
 group.add_argument('-v', '--verbose', action='store_true', help='Print all data')
