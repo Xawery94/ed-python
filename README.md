@@ -7,7 +7,7 @@ The project involves creating projects for the subject of data mining. The proje
 #
 #### Example usage of program
 
-`python knn.py -k 5 -m e -t train -f iris.csv -d 5 -v` 
+`python knn.py -k 5 -m e -t train -d 5 -v iris.csv` 
 
 - `-k INT` - number of neighbours for KNN
 - `-m TYPE` - metric type (e - euclidean distance, m - manhattan distance)
