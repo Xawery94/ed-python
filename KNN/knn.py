@@ -11,7 +11,7 @@ parser.add_argument('-m', '--metric', default='e', help='Type of metric [e|m]', 
 parser.add_argument('-t', '--train', default='train', help='Type of test set [train|split]', metavar='')
 parser.add_argument('-d', '--decision', required=True, type=int, default=1, help='Index of decision attribute',
                     metavar='')
-parser.add_argument('-s', '--split', default=0.25, help='Split size in percent', metavar='')
+parser.add_argument('-s', '--split', default=0.5, type=float, help='Split size in percent', metavar='')
 parser.add_argument('file', type=argparse.FileType('r'), metavar='FILE')
 
 group = parser.add_mutually_exclusive_group()
@@ -79,7 +79,7 @@ def getMostFrequentClass(trainingSet, neighbors):
 def euclideanDistance(data1, data2, length):
     distance = 0
     for x in range(length):
-        if (x != col):
+        if x != col:
             distance += np.square(data1[x] - data2[x])
     return np.sqrt(distance)
 
@@ -87,7 +87,7 @@ def euclideanDistance(data1, data2, length):
 def manhattanDistance(data1, data2, length):
     distance = 0
     for x in range(length):
-        if (x != col):
+        if x != col:
             distance += np.absolute(data1[x] - data2[x])
     return distance
 
@@ -97,7 +97,7 @@ def calculateAccuracy(testData, predictedData):
 
     totalPredictionsNumber = 0
     for data in predictedData:
-        if (predictedData[data] == testData.values[totalPredictionsNumber][col]):
+        if predictedData[data] == testData.values[totalPredictionsNumber][col]:
             correctClasses += 1
         totalPredictionsNumber += 1
 
@@ -105,9 +105,9 @@ def calculateAccuracy(testData, predictedData):
 
 
 def SetCalculateDistanceMethod(method):
-    if (method == "m"):
+    if method == "m":
         return manhattanDistance
-    elif (method == "e"):
+    elif method == "e":
         return euclideanDistance
 
 
