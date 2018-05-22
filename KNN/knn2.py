@@ -7,11 +7,12 @@ import pandas as pd
 
 parser = argparse.ArgumentParser(description='KNN classifier')
 parser.add_argument('-k', '--knn', type=int, default=5, help='Number of k for KNN', metavar='')
-parser.add_argument('-m', '--metric', default='e', help='Type of metric', metavar='')
-parser.add_argument('-t', '--train', default='train', help='Type of test set', metavar='')
-parser.add_argument('-f', '--file', required=True, default='iris.csv', help='Data file path', metavar='')
-parser.add_argument('-d', '--decision', required=True, type=int, help='Index of decision attribute', metavar='')
-parser.add_argument('-s', '--split', default=0.25, help='Split size', metavar='')
+parser.add_argument('-m', '--metric', default='e', help='Type of metric [e|m]', metavar='')
+parser.add_argument('-t', '--train', default='train', help='Type of test set [train|split]', metavar='')
+parser.add_argument('-d', '--decision', required=True, type=int, default=1, help='Index of decision attribute',
+                    metavar='')
+parser.add_argument('-s', '--split', default=0.25, help='Split size in percent', metavar='')
+parser.add_argument('-f', '--file', required=True, help='Data file path', metavar='FILE')
 
 group = parser.add_mutually_exclusive_group()
 group.add_argument('-v', '--verbose', action='store_true', help='Print all data')
@@ -129,6 +130,7 @@ arg_test_size = args.split
 arg_col = args.decision
 arg_k = args.knn
 arg_file = args.file
+arg_train = args.train
 
 # -----------------------------------------------------
 
@@ -139,8 +141,12 @@ data = data.values
 random.shuffle(data)
 data = pd.DataFrame(data)
 
-trainingData = data[:-int(arg_test_size * len(data))]
-testData = data[-int(arg_test_size * len(data)):]
+if arg_train == 'split':
+    trainingData = data[:-int(arg_test_size * len(data))]
+    testData = data[-int(arg_test_size * len(data)):]
+elif arg_train == 'train':
+    trainingData = data
+    testData = data
 
 if __name__ == '__main__':
     result, neighbors, accuracy = knn(trainingData, testData, arg_k)
