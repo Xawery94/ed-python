@@ -12,6 +12,7 @@ The project involves creating projects for the subject of data mining. The proje
 - `-k INT` - number of neighbours for KNN
 - `-m TYPE` - metric type (e - euclidean distance, m - manhattan distance)
 - `-t TYPE` - type of test set (train, split)
+- `-s FLOAT` - size of split
 - `-d INT` - (required) index of decision column
 - `-v` - (optional) this flag is responsible for print verbose data
 - `FILE` - (required) file path of test data
