@@ -133,6 +133,7 @@ def printTree(root, g, rootName, decisionsCount):
             g.edge(str(rootName), str(leafName), label=str(l))
             i += 1
 
+    #TODO dokończyć - dodawanie węzłów których brakuje
     # if(parentMostFrequentDecision != None):
 
     if(len(root["nodes"]) > 0):
