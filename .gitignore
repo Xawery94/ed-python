@@ -33,3 +33,4 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 .vscode/launch.json
+Tree/.vscode/launch.json
