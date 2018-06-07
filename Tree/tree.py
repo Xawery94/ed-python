@@ -2,6 +2,7 @@ import argparse
 import math
 
 import pandas as pd
+from graphviz import Digraph
 
 parser = argparse.ArgumentParser(description='Decision Tree classifier')
 parser.add_argument('-l', '--decisionLabel', type=int, default=3, help='Decision column', metavar='')
@@ -75,12 +76,9 @@ def getRoot(data, infoGains, decisionEntropy):
     for d in rootCandidate["decisions"]:
         if (len(rootCandidate["decisions"][d]) == 1):
             rootCandidate["leafs"][d] = rootCandidate["decisions"][d][0][0]
-            print('L: ' + rootCandidate['label'])
         else:
-            # print("NODE")
             newData = getNewData(data, rootCandidate["label"], d)
             rootCandidate["nodes"][d] = id3(newData, decisionEntropy)
-            print('N: ' + rootCandidate['label'])
 
     return rootCandidate
 
@@ -111,9 +109,45 @@ def getNewData(data, label, rowLabel):
     return newData.drop([label], axis=1)
 
 
-def printTree(root):
-    print(root)
-    print("Print root here!!!!!!!!!!!")
+
+def printTree(root, g, rootName, decisionsCount):
+    if(rootName == None):
+        rootName = root["label"]
+    if(g == None):
+        g = Digraph()
+        g.node(rootName, root["label"])
+    if(decisionsCount == None):
+        decisionsCount = {}
+
+    i = 0
+    for l in root["leafs"]:
+        label = root["leafs"][l]
+        leafName = str(i) + rootName + label
+        g.node(leafName, label)
+        g.edge(rootName, leafName, label=str(l))
+        i += 1
+
+    # if(parentMostFrequentDecision != None):
+
+    if(len(root["nodes"]) > 0):
+        i = 0
+        for n in root["nodes"]:
+            nodeLabel = root["nodes"][n]["label"]
+            nodeName = str(i) + rootName + nodeLabel
+            g.node(nodeName, nodeLabel)
+            g.edge(rootName, nodeName, label=str(n))
+           
+            for d in root["decisions"][n]:
+                if(d[0] in decisionsCount):
+                    decisionsCount[d[0]] += d[1]
+                else:
+                    decisionsCount[d[0]] = d[1]
+
+            printTree(root["nodes"][n], g, nodeName, decisionsCount)
+            i += 1
+    else:
+        g.format = "png"
+        g.render('output/tree.gv', view=True)
 
 
 # -------------------------
@@ -126,4 +160,4 @@ decisionLabel = data.columns[args.decisionLabel]
 
 if __name__ == '__main__':
     root = id3(data, None)
-    printTree(root)
+    printTree(root, None, None, None)
