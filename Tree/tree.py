@@ -6,21 +6,25 @@ from graphviz import Digraph
 
 parser = argparse.ArgumentParser(description='Decision Tree classifier')
 parser.add_argument('-l', '--decisionLabel', type=int, default=3, help='Decision column', metavar='')
-parser.add_argument('-a', '--decisionAmount', type=int, default=2, help='Amount of decision classes', metavar='')
+parser.add_argument('-a', '--decisionAmount', type=int, default=4, help='Amount of decision classes', metavar='')
 # parser.add_argument('file', type=argparse.FileType('r'), metavar='FILE')  #uncomment at the end
 
 args = parser.parse_args()
 
 
 def id3(data, decisionEntropy):
+
+    print("Calculate entropy")
     entropies = calculateEntrophy(data)
 
     if (decisionEntropy == None):
         decisionEntropy = entropies[decisionLabel]
 
+    print("Calculate InfoGains")
     infoGains = calculateInfoGain(entropies, decisionEntropy)
     root = getRoot(data, infoGains, decisionEntropy)
 
+    print("Return root")
     return root
 
 
@@ -62,10 +66,10 @@ def calculateInfoGain(entropies, decisionEntropy):
 
 
 def getRoot(data, infoGains, decisionEntropy):
-    rootCandidate = {"infoGain": 0}
+    rootCandidate = None
 
     for ig in infoGains:
-        if (infoGains[ig]["infoGain"] > rootCandidate["infoGain"]):
+        if (rootCandidate == None or infoGains[ig]["infoGain"] > rootCandidate["infoGain"]):
             rootCandidate = {"entropy": infoGains[ig]["entropy"],
                              "decisions": infoGains[ig]["decisions"],
                              "infoGain": infoGains[ig]["infoGain"],
@@ -109,23 +113,25 @@ def getNewData(data, label, rowLabel):
     return newData.drop([label], axis=1)
 
 
-
 def printTree(root, g, rootName, decisionsCount):
+    isRoot = False
     if(rootName == None):
         rootName = root["label"]
+        isRoot = True
     if(g == None):
         g = Digraph()
-        g.node(rootName, root["label"])
+        g.node(str(rootName), str(rootName))
     if(decisionsCount == None):
         decisionsCount = {}
 
-    i = 0
-    for l in root["leafs"]:
-        label = root["leafs"][l]
-        leafName = str(i) + rootName + label
-        g.node(leafName, label)
-        g.edge(rootName, leafName, label=str(l))
-        i += 1
+    if(len(root["leafs"]) == 0):
+        i = 0
+        for l in root["leafs"]:
+            label = root["leafs"][l]
+            leafName = str(i) + str(rootName) + str(label)
+            g.node(str(leafName), str(label))
+            g.edge(str(rootName), str(leafName), label=str(l))
+            i += 1
 
     # if(parentMostFrequentDecision != None):
 
@@ -133,10 +139,10 @@ def printTree(root, g, rootName, decisionsCount):
         i = 0
         for n in root["nodes"]:
             nodeLabel = root["nodes"][n]["label"]
-            nodeName = str(i) + rootName + nodeLabel
-            g.node(nodeName, nodeLabel)
-            g.edge(rootName, nodeName, label=str(n))
-           
+            nodeName = str(i) + str(rootName) + str(nodeLabel)
+            g.node(str(nodeName), str(nodeLabel))
+            g.edge(str(rootName), str(nodeName), label=str(n))
+
             for d in root["decisions"][n]:
                 if(d[0] in decisionsCount):
                     decisionsCount[d[0]] += d[1]
@@ -145,19 +151,24 @@ def printTree(root, g, rootName, decisionsCount):
 
             printTree(root["nodes"][n], g, nodeName, decisionsCount)
             i += 1
-    else:
+
+    if(isRoot == True):
+        print("Print tree.")
         g.format = "png"
         g.render('output/tree.gv', view=True)
 
 
 # -------------------------
-arg_isHeader = True
+arg_isHeader = None
 arg_nDecisionClasses = args.decisionAmount
 # data = pd.read_csv(args.file)    #file import
-data = pd.read_csv('s.csv')
-decisionLabel = data.columns[args.decisionLabel]
+data = pd.read_csv('car.csv', header=arg_isHeader)
+# decisionLabel = data.columns[args.decisionLabel]
+decisionLabel = 6
 # -------------------------
 
 if __name__ == '__main__':
+    print("Run ID3")
     root = id3(data, None)
+
     printTree(root, None, None, None)
