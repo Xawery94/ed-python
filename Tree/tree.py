@@ -6,7 +6,7 @@ from graphviz import Digraph
 
 parser = argparse.ArgumentParser(description='Decision Tree classifier')
 parser.add_argument('-l', '--decisionLabel', type=int, default=3, help='Decision column', metavar='')
-parser.add_argument('-a', '--decisionAmount', type=int, default=4, help='Amount of decision classes', metavar='')
+parser.add_argument('-a', '--decisionAmount', type=int, default=2, help='Amount of decision classes', metavar='')
 # parser.add_argument('file', type=argparse.FileType('r'), metavar='FILE')  #uncomment at the end
 
 args = parser.parse_args()
@@ -66,10 +66,10 @@ def calculateInfoGain(entropies, decisionEntropy):
 
 
 def getRoot(data, infoGains, decisionEntropy):
-    rootCandidate = None
+    rootCandidate = {}
 
     for ig in infoGains:
-        if (rootCandidate == None or infoGains[ig]["infoGain"] > rootCandidate["infoGain"]):
+        if ("infoGain" not in rootCandidate or infoGains[ig]["infoGain"] > rootCandidate["infoGain"]):
             rootCandidate = {"entropy": infoGains[ig]["entropy"],
                              "decisions": infoGains[ig]["decisions"],
                              "infoGain": infoGains[ig]["infoGain"],
@@ -124,7 +124,7 @@ def printTree(root, g, rootName, decisionsCount):
     if(decisionsCount == None):
         decisionsCount = {}
 
-    if(len(root["leafs"]) == 0):
+    if(len(root["leafs"]) > 0):
         i = 0
         for l in root["leafs"]:
             label = root["leafs"][l]
@@ -160,12 +160,15 @@ def printTree(root, g, rootName, decisionsCount):
 
 
 # -------------------------
-arg_isHeader = None
+arg_isHeader = True
 arg_nDecisionClasses = args.decisionAmount
 # data = pd.read_csv(args.file)    #file import
-data = pd.read_csv('car.csv', header=arg_isHeader)
-# decisionLabel = data.columns[args.decisionLabel]
-decisionLabel = 6
+data = None
+if(arg_isHeader == True):
+    data = pd.read_csv('s.csv')
+else:
+    data = pd.read_csv('s.csv', header=None)
+decisionLabel = data.columns[args.decisionLabel]
 # -------------------------
 
 if __name__ == '__main__':
