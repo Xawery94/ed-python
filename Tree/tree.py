@@ -163,19 +163,20 @@ def printTree(root, g, rootName, decisionsCount):
     if(len(root["nodes"]) > 0):
         i = 0
         for n in root["nodes"]:
-            nodeLabel = root["nodes"][n]["label"]
-            nodeName = str(i) + str(rootName) + str(nodeLabel)
-            g.node(str(nodeName), str(nodeLabel))
-            g.edge(str(rootName), str(nodeName), label=str(n))
+            if(root["nodes"][n] != None):
+                nodeLabel = str(root["nodes"][n]["label"])
+                nodeName = str(i) + str(rootName) + str(nodeLabel)
+                g.node(str(nodeName), str(nodeLabel))
+                g.edge(str(rootName), str(nodeName), label=str(n))
 
-            decisions = GetDecisionRows(data, root["label"], n)
-            for d in decisions:
-                if(d[0] in decisionsCount):
-                    decisionsCount[d[0]] += d[1]
-                else:
-                    decisionsCount[d[0]] = d[1]
+                decisions = GetDecisionRows(data, root["label"], n)
+                for d in decisions:
+                    if(d[0] in decisionsCount):
+                        decisionsCount[d[0]] += d[1]
+                    else:
+                        decisionsCount[d[0]] = d[1]
 
-            printTree(root["nodes"][n], g, nodeName, decisionsCount)
+                printTree(root["nodes"][n], g, nodeName, decisionsCount)
             i += 1
 
     if(isRoot == True):
@@ -200,4 +201,7 @@ if __name__ == '__main__':
     print("Run ID3")
     root = id3(data, None)
 
-    printTree(root, None, None, None)
+    if(root != None):
+        printTree(root, None, None, None)
+    else:
+        print("Cant generate tree. Cant find root. Change minimum info gain.")
