@@ -5,9 +5,11 @@ import pandas as pd
 from graphviz import Digraph
 
 parser = argparse.ArgumentParser(description='Decision Tree classifier')
-parser.add_argument('-l', '--decisionLabel', type=int, default=3, help='Decision column', metavar='')
+parser.add_argument('-l', '--decisionLabel', type=int, default=4, help='Decision column', metavar='')
+parser.add_argument('-ih', '--isHeader', action='store_true', help='Is columns in file has headers')
 parser.add_argument('-a', '--decisionAmount', type=int, default=2, help='Amount of decision classes', metavar='')
-# parser.add_argument('file', type=argparse.FileType('r'), metavar='FILE')  #uncomment at the end
+parser.add_argument('-i', '--minInfoGain', type=float, default=0.0, help='Min InfoGain', metavar='')
+parser.add_argument('file', type=argparse.FileType('r'), metavar='FILE')
 
 args = parser.parse_args()
 
@@ -22,10 +24,11 @@ def id3(data, decisionEntropy):
 
     print("Calculate InfoGains")
     infoGains = calculateInfoGain(entropies, decisionEntropy)
-    root = getRoot(data, infoGains, decisionEntropy)
+    if(len(infoGains) != 0):
+        root = getRoot(data, infoGains, decisionEntropy)
 
-    print("Return root")
-    return root
+        print("Return root")
+        return root
 
 
 def calculateEntrophy(data):
@@ -58,9 +61,11 @@ def calculateInfoGain(entropies, decisionEntropy):
     for e in entropies:
         if (e != decisionLabel):
             infoGain = decisionValue["entropy"] - entropies[e]["entropy"]
-            result[e] = {"entropy": entropies[e]["entropy"],
-                         "decisions": entropies[e]["decisions"],
-                         "infoGain": infoGain}
+
+            if(infoGain > minInfoGain):
+                result[e] = {"entropy": entropies[e]["entropy"],
+                            "decisions": entropies[e]["decisions"],
+                            "infoGain": infoGain}
 
     return result
 
@@ -107,11 +112,26 @@ def GetRows(data, column):
 def GetDecisionRows(data, rowColumn, row):
     return data[data[rowColumn] == row].groupby(decisionLabel).size().reset_index(name='Count').values
 
+def getMostFrequentDecision(dictionary):
+    candidateName = ''
+    candidateCount = 0
+    for d in dictionary:
+        if(candidateName == '' or dictionary[d] > candidateCount):
+            candidateName = d
+            candidateCount = dictionary[d]
+    return candidateName
+
 
 def getNewData(data, label, rowLabel):
     newData = data[data[label] == rowLabel]
     return newData.drop([label], axis=1)
 
+def checkIfAttributeExistsInDictionary(attribute, dictionary):
+    for d in dictionary:
+        if(d == attribute):
+            return True
+    
+    return False
 
 def printTree(root, g, rootName, decisionsCount):
     isRoot = False
@@ -125,16 +145,20 @@ def printTree(root, g, rootName, decisionsCount):
         decisionsCount = {}
 
     if(len(root["leafs"]) > 0):
+        rows = GetRows(data, root["label"])
         i = 0
-        for l in root["leafs"]:
-            label = root["leafs"][l]
-            leafName = str(i) + str(rootName) + str(label)
-            g.node(str(leafName), str(label))
-            g.edge(str(rootName), str(leafName), label=str(l))
-            i += 1
+        for r in rows:
+            if(checkIfAttributeExistsInDictionary(r[0], root["nodes"]) == False):
+                label = ''
+                if(checkIfAttributeExistsInDictionary(r[0], root["leafs"]) == True):
+                    label = root["leafs"][r[0]]
+                else:
+                    label = getMostFrequentDecision(decisionsCount)
 
-    #TODO dokończyć - dodawanie węzłów których brakuje
-    # if(parentMostFrequentDecision != None):
+                leafName = str(i) + str(rootName) + str(label)
+                g.node(str(leafName), str(label))
+                g.edge(str(rootName), str(leafName), label=str(r[0]))
+            i += 1
 
     if(len(root["nodes"]) > 0):
         i = 0
@@ -144,7 +168,8 @@ def printTree(root, g, rootName, decisionsCount):
             g.node(str(nodeName), str(nodeLabel))
             g.edge(str(rootName), str(nodeName), label=str(n))
 
-            for d in root["decisions"][n]:
+            decisions = GetDecisionRows(data, root["label"], n)
+            for d in decisions:
                 if(d[0] in decisionsCount):
                     decisionsCount[d[0]] += d[1]
                 else:
@@ -160,15 +185,15 @@ def printTree(root, g, rootName, decisionsCount):
 
 
 # -------------------------
-arg_isHeader = True
-arg_nDecisionClasses = args.decisionAmount
-# data = pd.read_csv(args.file)    #file import
 data = None
-if(arg_isHeader == True):
-    data = pd.read_csv('s.csv')
+if(args.isHeader == True):
+    data = pd.read_csv(args.file)
 else:
-    data = pd.read_csv('s.csv', header=None)
-decisionLabel = data.columns[args.decisionLabel]
+    data = pd.read_csv(args.file, header=None)
+
+arg_nDecisionClasses = args.decisionAmount
+decisionLabel = data.columns[args.decisionLabel - 1]
+minInfoGain = args.minInfoGain
 # -------------------------
 
 if __name__ == '__main__':
