@@ -38,12 +38,12 @@ brew install graphviz
 #
 #### Example usage of program for Decision Tree
 
-`python tree.py -l 3 -a 2 -i 0.5 -g car.csv` 
+`python tree.py -l 3 -a 2 -i 0.5 car.csv` 
 
 - `-l INT` - decision column
 - `-a INT` - amount of decision classes
 - `-i FLOAT` - minimal infoGain for attribute type (default 0.0)
-- `-g` - calculate with gainRatio
+- `-ih` - enable header from csv
 - `FILE` - (required) file path of test data
 
 #
