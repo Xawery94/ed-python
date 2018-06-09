@@ -1,0 +1,6 @@
+Dayofweek,Weather,TvTonight,Accepted
+weekday,warm,bad,no
+weekday,warm,good,no
+weekend,warm,bad,yes
+weekend,cold,good,no
+weekend,cold,bad,yes
